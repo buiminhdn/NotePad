@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Notepad</string>
+    <string name="my_categories">My Categories</string>
+    <string name="themes">Themes</string>
+    <string name="nav_open">Open</string>
+    <string name="nav_close">Close</string>
+</resources>
