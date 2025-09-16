@@ -4,10 +4,13 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverter
+import androidx.room.TypeConverters
 import com.example.notepad.database.DAO.CategoryDao
 import com.example.notepad.database.DAO.NoteDao
 import com.example.notepad.models.Category
 import com.example.notepad.models.Note
+import java.util.Date
 
 @Database(entities = [Note::class, Category::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {

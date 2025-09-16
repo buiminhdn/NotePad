@@ -2,7 +2,6 @@ package com.example.notepad.database.DAO
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
@@ -19,6 +18,6 @@ interface NoteDao {
     @Update
     suspend fun update(note: Note)
 
-    @Delete
-    suspend fun delete(note: Note)
+    @Query("DELETE FROM notes WHERE id = :id")
+    suspend fun delete(id: Int)
 }

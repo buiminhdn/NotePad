@@ -11,6 +11,7 @@ import com.example.notepad.repositories.CategoryRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+// Change Something
 class CategoryViewModel(application: Application) : AndroidViewModel(application) {
     val categories: LiveData<List<Category>>
     private val repository: CategoryRepository

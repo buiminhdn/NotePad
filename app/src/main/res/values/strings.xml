@@ -4,4 +4,12 @@
     <string name="themes">Themes</string>
     <string name="nav_open">Open</string>
     <string name="nav_close">Close</string>
+    <string name="project_title">Notepad</string>
+    <string name="save">SAVE</string>
+    <string name="undo">UNDO</string>
+    <string name="more">More</string>
+    <string name="delete">Delete</string>
+    <string name="view_category">View Category</string>
+
+    <string name="NoteDetailObject">NoteDetailObject</string>
 </resources>
