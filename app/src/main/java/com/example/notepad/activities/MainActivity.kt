@@ -1,31 +1,30 @@
 package com.example.notepad.activities
 
+import android.content.DialogInterface
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.annotation.RequiresApi
+import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.notepad.R
 import com.example.notepad.adapters.NoteAdapter
-import com.example.notepad.assets.TempData
 import com.example.notepad.databinding.ActivityMainBinding
-import com.example.notepad.models.Note
-import com.example.notepad.viewmodels.NoteViewModel
-import java.sql.Date
-import java.time.LocalDate
-import androidx.activity.viewModels
-import androidx.lifecycle.ViewModelProvider
 import com.example.notepad.helpers.IS_EDITED_ACTION
 import com.example.notepad.helpers.NOTE_DETAIL_OBJECT
+import com.example.notepad.helpers.showToast
+import com.example.notepad.models.Note
+import com.example.notepad.viewmodels.NoteViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 
 class MainActivity : AppCompatActivity() {
@@ -34,6 +33,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var toggle: ActionBarDrawerToggle
     private lateinit var noteAdapter: NoteAdapter
     private val noteViewModel: NoteViewModel by viewModels()
+
+    private lateinit var selectedFruits: String
+    private var selectedFruitsIndex: Int = 0
+    private val fruits = arrayOf("Apple", "Banana", "Coconut", "Orange", "Pineapple",
+        "Papaya", "Mango", "Blackberries", "Guava")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,17 +53,32 @@ class MainActivity : AppCompatActivity() {
 
         // Khoi tao Toolbar & Drawer
         initNavigationView()
+        // Xu ly Event Click Drawer
+        handleClickDrawerMenu()
+        // Khoi tao Adapter and ViewModel
+        bindViewModel()
+        // Xu ly Event Click Add
+        handleClickAdd()
 
-        noteAdapter = NoteAdapter(emptyList(),::startToNoteDetail)
 
-        binding.recyclerView.layoutManager = LinearLayoutManager(this)
-        binding.recyclerView.adapter = noteAdapter
+    }
 
-        noteViewModel.notes.observe(this) { notes ->
-            noteAdapter.setNotes(notes)
+    private fun handleClickDrawerMenu() {
+        binding.navView.setNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navEditCategories -> {
+                    startActivity(Intent(this, CategoryActivity::class.java))
+                    binding.drawerLayout.closeDrawers()
+                    true
+                }
+
+                else -> true
+            }
         }
+    }
 
-        binding.favPlus.setOnClickListener {
+    private fun handleClickAdd() {
+        binding.btnAdd.setOnClickListener {
             val intent = Intent(this, NoteDetailActivity::class.java).apply {
                 putExtra(IS_EDITED_ACTION, false)
             }
@@ -67,12 +86,30 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun startToNoteDetail(note: Note){
+    private fun bindViewModel() {
+        noteAdapter = NoteAdapter(emptyList(), ::startToNoteDetail, ::showNoteDetailOptions)
+
+        binding.rvNotes.layoutManager = LinearLayoutManager(this)
+        binding.rvNotes.adapter = noteAdapter
+
+//        noteViewModel.notes.observe(this,::updateNotes)
+        noteViewModel.notes.observe(this,noteAdapter::setNotes)
+    }
+
+//    private fun updateNotes(notes: List<Note>){
+//        noteAdapter.setNotes(notes)
+//    }
+
+    private fun startToNoteDetail(note: Note) {
         val intent = Intent(this, NoteDetailActivity::class.java).apply {
             putExtra(NOTE_DETAIL_OBJECT, note)
             putExtra(IS_EDITED_ACTION, true)
         }
         startActivity(intent)
+    }
+
+    private fun showNoteDetailOptions(id: Int) {
+        showToast("$id", this)
     }
 
     private fun initNavigationView() {
@@ -96,18 +133,20 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.search -> {
-                Toast.makeText(this, "Search clicked", Toast.LENGTH_SHORT).show()
+            R.id.navSearch -> {
+//                showSearchDialog()
+                val searchBtn = findViewById<View>(R.id.navSearch)
+                searchBtn.visibility = View.GONE
+                val sortBtn = findViewById<View>(R.id.navSort)
+                sortBtn.visibility = View.GONE
+                binding.edtSearch.visibility = View.VISIBLE;
+                binding.btnDeleteSearch.visibility = View.VISIBLE;
+                binding.edtSearch.requestFocus();
                 true
             }
 
-            R.id.sort -> {
-                Toast.makeText(this, "Sort clicked", Toast.LENGTH_SHORT).show()
-                true
-            }
-
-            R.id.nav_viewCategory -> {
-                Toast.makeText(this, "View Category clicked", Toast.LENGTH_SHORT).show()
+            R.id.navSort -> {
+                showSortDialog()
                 true
             }
 
@@ -121,8 +160,40 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        // Reload Notes List
+    private fun showSortDialog() {
+        selectedFruits = fruits[selectedFruitsIndex]
+        MaterialAlertDialogBuilder(this)
+            .setTitle("List of Fruits")
+            .setSingleChoiceItems(fruits, selectedFruitsIndex) { dialog_, which ->
+                selectedFruitsIndex = which
+                selectedFruits = fruits[which]
+            }
+            .setPositiveButton("Ok") { dialog, which ->
+                Toast.makeText(this, "$selectedFruits Selected", Toast.LENGTH_SHORT)
+                    .show()
+            }
+            .setNegativeButton("Cancel") { dialog, which ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun showSearchDialog() {
+        val builder = AlertDialog.Builder(this)
+        val inflater = layoutInflater
+        builder.setTitle("Filter with Keyword")
+        val dialogLayout = inflater.inflate(R.layout.alert_dialog_with_edittext, null)
+        val editText = dialogLayout.findViewById<EditText>(R.id.edtKeyword)
+        builder.setView(dialogLayout)
+        builder.setPositiveButton("OK") { dialogInterface, i ->
+            filterNotesByKeyword(editText.text.toString())
+        }
+        builder.show()
+    }
+
+    private fun filterNotesByKeyword(keyword: String) {
+        noteViewModel.getAllNoteByKeyword(keyword,this,noteAdapter::setNotes)
+//        noteViewModel.getAllNotesByKeyword(keyword)
+//        noteViewModel.filteredNote.observe(this,noteAdapter::setNotes)
     }
 }

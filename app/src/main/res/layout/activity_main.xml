@@ -8,7 +8,6 @@
     android:fitsSystemWindows="true"
     tools:context=".activities.MainActivity">
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -24,11 +23,40 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:titleTextColor="@color/white" />
+            app:popupTheme="@style/ToolbarPopupTheme"
+            app:titleTextColor="@color/white">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/edtSearch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints=""
+                    android:inputType="text"
+                    android:visibility="gone"
+                    tools:ignore="LabelFor" />
+
+                <ImageButton
+                    android:id="@+id/btnDeleteSearch"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:contentDescription="TODO"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_x" />
+
+
+            </LinearLayout>
+
+
+        </com.google.android.material.appbar.MaterialToolbar>
 
         <!-- Nội dung -->
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
+            android:id="@+id/rvNotes"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -37,11 +65,11 @@
             app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fav_plus"
+            android:id="@+id/btnAdd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="20dp"
-            android:contentDescription="Add Note"
+            android:contentDescription="@string/add_note_button"
             app:backgroundTint="@color/primary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -51,7 +79,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.navigation.NavigationView
-        android:id="@+id/nav_view"
+        android:id="@+id/navView"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"

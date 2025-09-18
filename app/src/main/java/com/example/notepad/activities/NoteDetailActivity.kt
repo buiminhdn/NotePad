@@ -1,7 +1,10 @@
 package com.example.notepad.activities
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.Menu
@@ -22,6 +25,7 @@ import com.example.notepad.helpers.NOTE_DETAIL_OBJECT
 import com.example.notepad.helpers.showToast
 import com.example.notepad.models.Note
 import com.example.notepad.viewmodels.NoteViewModel
+import java.util.Stack
 
 class NoteDetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityNoteDetailBinding
@@ -30,6 +34,21 @@ class NoteDetailActivity : AppCompatActivity() {
     private var currentNoteId: Int = 0
     private var isEditedAction = false
     private val noteViewModel: NoteViewModel by viewModels()
+
+    // Undo
+    private val undoStack = Stack<String>()
+    private var lastSavedText = ""
+    private val handler = Handler(Looper.getMainLooper())
+    private val saveRunnable = object : Runnable {
+        override fun run() {
+            val currentText = binding.edtContent.text.toString()
+            if (currentText != lastSavedText) {
+                undoStack.push(currentText)
+                lastSavedText = currentText
+            }
+            handler.postDelayed(this, 1000)
+        }
+    }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,12 +64,14 @@ class NoteDetailActivity : AppCompatActivity() {
         }
 
         initToolbar()
+        getNoteDataIfUpdate()
+        handleContentChange()
 
-        isEditedAction = intent.getBooleanExtra(IS_EDITED_ACTION, false)
+        handler.post(saveRunnable)
+    }
 
-        if (isEditedAction) getNoteDataBundle()
-
-        binding.contentEdt.addTextChangedListener(object : TextWatcher {
+    private fun handleContentChange() {
+        binding.edtContent.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable) {}
             override fun beforeTextChanged(
                 s: CharSequence, start: Int,
@@ -65,22 +86,26 @@ class NoteDetailActivity : AppCompatActivity() {
                 optionsMenu[1].isEnabled = s.toString().isNotEmpty()
             }
         })
+    }
 
-
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun getNoteDataIfUpdate() {
+        isEditedAction = intent.getBooleanExtra(IS_EDITED_ACTION, false)
+        if (isEditedAction) getNoteDataBundle()
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun getNoteDataBundle() {
         item = intent.getParcelableExtra(NOTE_DETAIL_OBJECT, Note::class.java)!!
         currentNoteId = item.id
-        binding.titleEdt.setText(item.title)
-        binding.contentEdt.setText(item.content)
+        binding.edtTitle.setText(item.title)
+        binding.edtContent.setText(item.content)
     }
 
     private fun initToolbar() {
-        setSupportActionBar(binding.toolbarDetail)
+        setSupportActionBar(binding.toolbar)
 
-        binding.toolbarDetail.setNavigationOnClickListener {
+        binding.toolbar.setNavigationOnClickListener {
             finish()
         }
     }
@@ -119,18 +144,24 @@ class NoteDetailActivity : AppCompatActivity() {
     }
 
     private fun undoNote() {
-        val currentLength: Int = binding.contentEdt.length()
-        if (currentLength > 0) {
-            binding.contentEdt.setText(
-                binding.contentEdt.getText().delete(currentLength - 1, currentLength)
-            )
-            binding.contentEdt.setSelection(currentLength - 1)
+        if (undoStack.size > 1) {
+            undoStack.pop() // remove current
+            val prev = undoStack.peek()
+            prev?.let {
+                binding.edtContent.setText(it)
+                binding.edtContent.setSelection(it.length)
+                lastSavedText = it
+            }
+        } else {
+            undoStack.clear()
+            binding.edtContent.setText("")
+            lastSavedText = ""
         }
     }
 
     private fun upsertNote() {
-        val noteTitle = binding.titleEdt.text.toString()
-        val noteContent = binding.contentEdt.text.toString()
+        val noteTitle = binding.edtTitle.text.toString()
+        val noteContent = binding.edtContent.text.toString()
 
         if (noteTitle.isEmpty() && noteContent.isEmpty()) {
             showToast("Type Something", this)
@@ -141,11 +172,18 @@ class NoteDetailActivity : AppCompatActivity() {
 
         // Update & Add
         if (currentNoteId != 0) {
-            noteViewModel.updateNote(Note(0, noteTitle, noteContent, currentDateAndTime.toString()))
+            noteViewModel.updateNote(Note(currentNoteId, noteTitle, noteContent, currentDateAndTime.toString()))
             showToast("$noteTitle Updated", this)
         } else {
             noteViewModel.addNote(Note(0, noteTitle, noteContent, currentDateAndTime.toString()))
             showToast("$noteTitle Added", this)
         }
+
+        finish()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacks(saveRunnable) // cleanup
     }
 }

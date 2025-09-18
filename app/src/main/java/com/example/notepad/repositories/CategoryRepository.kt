@@ -17,7 +17,7 @@ class CategoryRepository(private val categoryDao: CategoryDao) {
         categoryDao.update(category)
     }
 
-    suspend fun delete(category: Category){
-        categoryDao.delete(category)
+    suspend fun delete(id: Int){
+        categoryDao.delete(id)
     }
 }

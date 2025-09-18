@@ -1,4 +1,4 @@
-package com.example.notepad.callback
+package com.example.notepad.callbacks
 
 import com.example.notepad.models.Note
 

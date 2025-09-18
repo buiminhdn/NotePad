@@ -2,22 +2,40 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/search"
+        android:id="@+id/navSearch"
         android:icon="@drawable/ic_search_24dp"
-        android:title="Search"
-        android:contentDescription="Search"
+        android:title="@string/search"
+        android:contentDescription="@string/button_to_search"
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/sort"
-        android:title="Sort"
-        android:contentDescription="Sort"
+        android:id="@+id/navSort"
+        android:title="@string/sort"
+        android:contentDescription="@string/button_to_sort"
         app:showAsAction="ifRoom" />
 
+
     <item
-        android:id="@+id/more"
-        android:title="More"
-        android:iconTint="@color/white"
-        android:contentDescription="More"
+        android:id="@+id/navMore"
+        android:title="@string/more"
+        app:iconTint="@color/white"
+        android:contentDescription="@string/button_for_more"
+        app:showAsAction="never" />
+
+
+    <!--  Later  -->
+    <item
+        android:title="@string/select_all_notes"
+        android:contentDescription="@string/button_for_more"
+        app:showAsAction="never" />
+
+    <item
+        android:title="@string/import_text_files"
+        android:contentDescription="@string/button_for_more"
+        app:showAsAction="never" />
+
+    <item
+        android:title="@string/export_notes_to_text_files"
+        android:contentDescription="@string/button_for_more"
         app:showAsAction="never" />
 </menu>

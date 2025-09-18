@@ -16,4 +16,40 @@
         android:id="@+id/navDelete"
         android:title="@string/delete"
         app:showAsAction="never" />
+
+
+    <!--  Later  -->
+    <item
+        android:title="@string/share"
+        app:showAsAction="never" />
+    <item
+        android:title="@string/delete"
+        app:showAsAction="never" />
+    <item
+        android:title="@string/search"
+        app:showAsAction="never" />
+    <item
+        android:title="@string/export_to_text_file"
+        app:showAsAction="never" />
+    <item
+        android:title="@string/categorize"
+        app:showAsAction="never" />
+    <item
+        android:title="@string/colorize"
+        app:showAsAction="never" />
+    <item
+        android:title="@string/covert_to_text"
+        app:showAsAction="never" />
+    <item
+        android:title="@string/switch_to_read_mode"
+        app:showAsAction="never" />
+    <item
+        android:title="@string/print"
+        app:showAsAction="never" />
+    <item
+        android:title="@string/show_formatting_bar"
+        app:showAsAction="never" />
+    <item
+        android:title="@string/show_info"
+        app:showAsAction="never" />
 </menu>

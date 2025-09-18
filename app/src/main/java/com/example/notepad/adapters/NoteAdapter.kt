@@ -9,7 +9,8 @@ import com.example.notepad.models.Note
 
 class NoteAdapter(
     private var notes: List<Note>,
-    private val onItemClick: (Note) -> Unit
+    private val onItemClick: (Note) -> Unit,
+    private val onItemLongClick: (Int) -> Unit
 ) :
     RecyclerView.Adapter<NoteAdapter.ViewHolder>() {
 
@@ -30,11 +31,16 @@ class NoteAdapter(
     override fun onBindViewHolder(holder: NoteAdapter.ViewHolder, position: Int) {
         val note = notes[position]
         holder.binding.apply {
-            noteItemTitleTxt.text = note.title
-            noteItemTimeTxt.text = note.updatedAt
+            txtTitle.text = note.title
+            txtUpdatedAt.text = note.updatedAt
 
             root.setOnClickListener {
                 onItemClick.invoke(note)
+            }
+
+            root.setOnLongClickListener {
+                onItemLongClick.invoke(note.id)
+                true
             }
         }
     }

@@ -22,8 +22,8 @@ class CategoryViewModel(application: Application) : AndroidViewModel(application
         categories = repository.allCategories
     }
 
-    fun deleteNote(category: Category) = viewModelScope.launch(Dispatchers.IO) {
-        repository.delete(category)
+    fun deleteCategory(id: Int) = viewModelScope.launch(Dispatchers.IO) {
+        repository.delete(id)
     }
 
     fun updateCategory(category: Category) = viewModelScope.launch(Dispatchers.IO) {
